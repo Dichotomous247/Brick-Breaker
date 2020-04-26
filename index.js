@@ -12,9 +12,11 @@ let y = canvas.height - 20
 let changeInX = 2
 let changeInY = -2
 
+let ballRadius = 10
+
 function drawBall(){
     context.beginPath();
-    context.arc(x,y,20,0,Math.PI*2)
+    context.arc(x,y,ballRadius,0,Math.PI*2)
     context.strokeStyle = 'green'
     context.stroke();
     context.closePath();
@@ -25,6 +27,20 @@ function draw(){
     drawBall();
     x+=changeInX
     y+=changeInY
+
+    if(y+changeInY<ballRadius){
+        changeInY=-changeInY
+    }
+    if(y+changeInY>canvas.height-ballRadius){
+        changeInY=-changeInY
+    }
+    if(x+changeInX<ballRadius){
+        changeInX=-changeInX
+    }
+    if(x+changeInX>canvas.width-ballRadius){
+        changeInX=-changeInX
+    }
 }
 setInterval(draw,10)
+
 
