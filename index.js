@@ -21,6 +21,49 @@ let rightArrowPress = false
 let leftArrowPress = false
 document.addEventListener('keyup',handleKeyUp,false);
 document.addEventListener('keydown',handleKeyDown,false);
+//brick varibles
+let brickRows = 4
+let brickColumns = 4
+let brickWidth = canvas.width/4-11
+let brickHeight = 20
+let brickPadding = 5
+let brickOffsetLeft = 15
+let brickOffsetTop = 15
+
+let bricks = []
+
+for(let i=0; i<brickColumns; i+=1){
+    bricks[i]=[]
+    for(let j=0; j<brickRows; j+=1){
+        bricks[i][j] = {x:0,y:0}          
+    }
+}
+function drawBricks(){
+    for(let i=0; i<brickColumns; i+=1){
+        for(let j=0; j<brickRows; j+=1){
+            let brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft
+            let brickY = (j*(brickHeight+brickPadding))+brickOffsetTop
+            bricks[i][j].x = brickX
+            bricks[i][j].y = brickY
+            context.beginPath();
+            context.rect(brickX,brickY,brickWidth,brickHeight)
+            context.fillStyle = 'darkslateblue'
+            context.fill();
+            context.closePath();
+        }
+    }
+}
+
+function collisionDetection(){
+    for(let i = 0; i<brickColumns; i+=1){
+        for(let j = 0; j<brickRows; j+=1){
+            let B = bricks[i][j]
+            if(x>B.x&&x<B.x+brickWidth&&y>B.y&&y<B.y<B.y+brickHeight){
+                changeInY=-changeInY
+            }
+        }
+    }
+}
 
 function handleKeyUp(){
     if (event.key==="Right"){
@@ -51,22 +94,24 @@ function handleKeyDown(event){
 function drawBall(){
     context.beginPath();
     context.arc(x,y,ballRadius,0,Math.PI*2)
-    context.strokeStyle = 'navy'
-    context.stroke();
+    context.fillStyle = 'darkslateblue'
+    context.fill();
     context.closePath();
 }
 function drawPaddle(){
     
     context.beginPath();
     context.rect(paddleX,canvas.height-paddleHeight-3,paddleWidth,paddleHeight)
-    context.strokeStyle = 'navy'
-    context.stroke();
+    context.fillStyle = 'darklateblue'
+    context.fill();
     context.closePath();
-}
+} 
 function draw(){
     context.clearRect(0, 0, canvas.width, canvas.height);
+    drawBricks();
     drawBall();
     drawPaddle();
+    collisionDetection();
 
     if(y+changeInY<ballRadius){
         changeInY=-changeInY
@@ -77,7 +122,7 @@ function draw(){
         if(x>paddleX&&x<paddleX+paddleWidth){
             changeInY=-changeInY
         }else{
-            alert("Game Over :(")
+            alert("Game Over. Reload the page to try again")
             document.location.reload
             clearInterval(interval)
         }
@@ -101,6 +146,5 @@ function draw(){
     y+=changeInY
 
 }
-
 
 let interval = setInterval(draw,10)
