@@ -15,7 +15,7 @@ let changeInY = -2
 let ballRadius = 10
 //paddle varibles
 let paddleHeight = 10
-let paddleWidth = 75
+let paddleWidth = 90
 let paddleX = (canvas.width-paddleWidth)/2
 let rightArrowPress = false
 let leftArrowPress = false
@@ -29,28 +29,48 @@ let brickHeight = 20
 let brickPadding = 5
 let brickOffsetLeft = 15
 let brickOffsetTop = 15
+//oth
+let ballSpeed = 10
+
+let score = 0
+
+let wonGame = false
 
 let bricks = []
-
+//initialize the bricks
 for(let i=0; i<brickColumns; i+=1){
     bricks[i]=[]
     for(let j=0; j<brickRows; j+=1){
-        bricks[i][j] = {x:0,y:0}          
+        bricks[i][j] = {x:0,y:0,status:1}          
     }
 }
+
+function drawScore(){
+    context.font = "20px Arial";
+    context.fillStyle = "slateblue"
+    context.fillText("Score: "+score, 10, 50);
+}
+
 function drawBricks(){
     for(let i=0; i<brickColumns; i+=1){
         for(let j=0; j<brickRows; j+=1){
-            let brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft
-            let brickY = (j*(brickHeight+brickPadding))+brickOffsetTop
-            bricks[i][j].x = brickX
-            bricks[i][j].y = brickY
-            context.beginPath();
-            context.rect(brickX,brickY,brickWidth,brickHeight)
-            context.fillStyle = 'darkslateblue'
-            context.fill();
-            context.closePath();
+            if(bricks[i][j].status===1){
+                let brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft
+                let brickY = (j*(brickHeight+brickPadding))+brickOffsetTop+60
+                bricks[i][j].x = brickX
+                bricks[i][j].y = brickY
+                context.beginPath();
+                context.rect(brickX,brickY,brickWidth,brickHeight)
+                context.fillStyle = 'slateblue'
+                context.fill();
+                context.closePath();
+            }
         }
+    }
+    if(wonGame){
+        alert("Congrats! You Win!")
+        document.location.reload();
+        clearInterval(interval)
     }
 }
 
@@ -58,8 +78,15 @@ function collisionDetection(){
     for(let i = 0; i<brickColumns; i+=1){
         for(let j = 0; j<brickRows; j+=1){
             let B = bricks[i][j]
-            if(x>B.x&&x<B.x+brickWidth&&y>B.y&&y<B.y<B.y+brickHeight){
-                changeInY=-changeInY
+            if(B.status===1){
+                if(x>B.x&&x<B.x+brickWidth&&y>B.y&&y<B.y+brickHeight){
+                    changeInY=-changeInY
+                    score+=100
+                    B.status = 0
+                    if(score===brickRows*brickColumns*100){
+                      wonGame = true
+                    }
+                }
             }
         }
     }
@@ -94,7 +121,7 @@ function handleKeyDown(event){
 function drawBall(){
     context.beginPath();
     context.arc(x,y,ballRadius,0,Math.PI*2)
-    context.fillStyle = 'darkslateblue'
+    context.fillStyle = 'slateblue'
     context.fill();
     context.closePath();
 }
@@ -102,13 +129,14 @@ function drawPaddle(){
     
     context.beginPath();
     context.rect(paddleX,canvas.height-paddleHeight-3,paddleWidth,paddleHeight)
-    context.fillStyle = 'darklateblue'
+    context.fillStyle = 'slateblue'
     context.fill();
     context.closePath();
 } 
 function draw(){
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
+    drawScore();
     drawBall();
     drawPaddle();
     collisionDetection();
@@ -122,8 +150,8 @@ function draw(){
         if(x>paddleX&&x<paddleX+paddleWidth){
             changeInY=-changeInY
         }else{
-            alert("Game Over. Reload the page to try again")
-            document.location.reload
+            alert("Game Over :(")
+            document.location.reload();
             clearInterval(interval)
         }
     
@@ -147,4 +175,4 @@ function draw(){
 
 }
 
-let interval = setInterval(draw,10)
+let interval = setInterval(draw,ballSpeed)
